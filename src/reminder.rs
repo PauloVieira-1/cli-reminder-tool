@@ -1,3 +1,14 @@
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum CommandType {
+    Add,
+    List,
+    Remove,
+    Update,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Reminder {
     pub id: i32,
     pub title: String,
@@ -7,11 +18,6 @@ pub struct Reminder {
 
 impl Reminder {
     pub fn new(id: i32, title: String, description: String, due_date: String) -> Self {
-        Self {
-            id,
-            title,
-            description,
-            due_date,
-        }
+        Self { id, title, description, due_date }
     }
 }

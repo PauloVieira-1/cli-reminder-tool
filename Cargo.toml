@@ -4,3 +4,9 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+serde_json = "1.0"
+dirs = "5.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_derive = "1.0.166"
+rand = "0.9.2"
+
