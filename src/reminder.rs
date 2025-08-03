@@ -1,0 +1,17 @@
+pub struct Reminder {
+    pub id: i32,
+    pub title: String,
+    pub description: String,
+    pub due_date: String,
+}
+
+impl Reminder {
+    pub fn new(id: i32, title: String, description: String, due_date: String) -> Self {
+        Self {
+            id,
+            title,
+            description,
+            due_date,
+        }
+    }
+}
