@@ -1,8 +1,7 @@
 use chrono::{DateTime, Utc};
 use tokio::time;
 use std::time::Duration;
-
-#[tokio::main]
+use std::process::Command;
 
 pub async fn start_timer(datetime: String) -> Result<(), Box<dyn std::error::Error>> {
 
@@ -18,7 +17,18 @@ pub async fn start_timer(datetime: String) -> Result<(), Box<dyn std::error::Err
     println!("Timer set for {} seconds.", duration.as_secs());
     time::sleep(Duration::from_secs(duration.as_secs())).await;
     println!("Time's up! Reminder for: {}", datetime);
-
+    create_notification()?;
     Ok(())
 
 }
+
+#[cfg(target_os = "macos")]
+
+pub fn create_notification() -> Result<(), Box<dyn std::error::Error>> {
+    Command::new("osascript")
+        .arg("-e")
+        .arg("display notification \"Time's up!\" with title \"Reminder\"")
+        .output()?;
+    Ok(())
+}
+

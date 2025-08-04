@@ -6,6 +6,7 @@ pub enum CommandType {
     List,
     Remove,
     Update,
+    Watch,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

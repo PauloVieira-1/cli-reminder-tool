@@ -27,10 +27,8 @@ pub fn save_reminder_to_file(reminder: &Reminder) {
     } 
 
     reminders.push(reminder.clone());
-    
-    let serialized_data = serde_json::to_string(&reminders).expect("Could not serialize reminders");
-    std::fs::write(file_path, serialized_data).expect("Could not write to data file");
 
+    write_to_file(&reminders, &file_path).expect("Could not write to data file");
     println!("Reminder saved successfully!");
 }
 
@@ -45,6 +43,36 @@ pub fn get_remdiners() -> Vec<Reminder> {
 
 }
 
+pub fn update_reminders(id: i32, title: String, description: String, due_date: String) -> Result<(), Box<dyn std::error::Error>> {
+    let file_path = get_data_file_path();
+    let mut reminders: Vec<Reminder> = vec![];
+
+    if file_path.exists() {
+        let data = std::fs::read_to_string(&file_path).expect("Could not read data file");
+        reminders = serde_json::from_str(&data).expect("Could not parse data file");
+    }
+
+    if reminders.iter().all(|r| r.id != id) { 
+        println!("No reminders found with the specified ID.");
+        return Ok(());
+    }
+
+    for r in &mut reminders {
+        if r.id == id {
+            r.title = title.clone();
+            r.description = description.clone();
+            r.due_date = due_date.clone();
+        }
+    }
+
+    write_to_file(&reminders, &file_path).expect("Could not write to data file");
+    println!("Reminder with ID {} updated successfully!", id);
+
+    Ok(())
+}
+
+
+
 pub fn remove_reminder(id: i32) -> Result<(), Box<dyn std::error::Error>> {
     let file_path = get_data_file_path();
     let mut reminders: Vec<Reminder> = vec![];
@@ -54,17 +82,24 @@ pub fn remove_reminder(id: i32) -> Result<(), Box<dyn std::error::Error>> {
         reminders = serde_json::from_str(&data).expect("Could not parse data file");
     }
 
-    if reminders.iter().all(|r| r.id != id) { // returns true for all elements in closure if id != id. If even one false is returned, returns false
+    if reminders.iter().all(|r| r.id != id) { 
         println!("No reminders found with the specified ID.");
         return Ok(());
     }
 
     reminders.retain(|r| r.id != id);
 
-    let serialized_data = serde_json::to_string(&reminders).expect("Could not serialize reminders");
-    std::fs::write(file_path, serialized_data).expect("Could not write to data file");
+    write_to_file(&reminders, &file_path).expect("Could not write to data file");
     println!("Reminder with ID {} removed successfully!", id);
 
     Ok(())
 }
 
+fn write_to_file(data: &Vec<Reminder>, file_path: &PathBuf) -> Result<(), Box<dyn std::error::Error>> {
+
+    let serialized_data = serde_json::to_string(&data).expect("Could not serialize reminders");
+    std::fs::write(file_path, serialized_data).expect("Could not write to data file");
+
+    Ok(())
+
+}
