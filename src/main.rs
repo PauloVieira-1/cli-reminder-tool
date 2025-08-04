@@ -5,11 +5,11 @@ mod watcher;
 mod command_handler;
 
 use std::env::args;
-use reminder::{Reminder, CommandType};
+use reminder::{Reminder};
 use data_manager::{save_reminder_to_file, get_remdiners, remove_reminder};
-use timer::start_timer;
+// use timer::start_timer;
 use watcher::watch_reminders;
-use command_handler::{add_command, list_reminders, remove_command, update_command};
+use command_handler::{add_command, list_reminders, remove_command, update_command, clear_command, CommandType};
 
 
 #[tokio::main]
@@ -36,6 +36,7 @@ fn get_command(command_str: &str) -> Option<CommandType> {
         "remove" => Some(CommandType::Remove),
         "update" => Some(CommandType::Update),
         "watch" => Some(CommandType::Watch),
+        "clear" => Some(CommandType::Clear),
         _ => None,
     }
 }
@@ -44,11 +45,11 @@ async fn handle_command(command: CommandType, args: &[String]) {
     match command {
         CommandType::Add => {
             add_command(args);
-            timer::start_timer(format!("{} {}", args[4], args[5]));
         }
         CommandType::List => list_reminders(),
         CommandType::Remove => remove_command(args),
         CommandType::Update => update_command(args),
+        CommandType::Clear => clear_command(),
         CommandType::Watch => {
             println!("Starting reminder watcher...");
             watch_reminders().await.expect("Failed to start watcher");
@@ -61,7 +62,7 @@ fn check_args(args: &[String]) -> bool {
 
     println!("args: {:?}", args);
     let expected_argument_count = match command.as_str() {
-        "list" | "watch" => 2,
+        "list" | "watch" | "clear" => 2,
         "remove" | "update" => 3,
         "add" => 6,
         _ => {

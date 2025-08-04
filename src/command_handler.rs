@@ -1,7 +1,18 @@
 
 use rand::Rng;
-use crate::reminder::{Reminder, CommandType};
-use crate::data_manager::{save_reminder_to_file, get_remdiners, remove_reminder, update_reminders};
+use crate::reminder::{Reminder};
+use crate::data_manager::{save_reminder_to_file, get_remdiners, remove_reminder, update_reminders, clear_reminders};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum CommandType {
+    Add,
+    List,
+    Remove,
+    Update,
+    Watch,
+    Clear,
+}
 
 pub fn add_command(args: &[String]) {
     println!("Adding a new reminder...");
@@ -64,3 +75,8 @@ pub fn get_longest_vector_length(vectors: &Vec<Reminder>) -> usize {
     longest_length
 }
 
+pub fn clear_command(){
+    println!("Clearing all reminders...");
+    clear_reminders().expect("Failed to clear reminders");
+    println!("Reminders cleared successfully!");   
+}

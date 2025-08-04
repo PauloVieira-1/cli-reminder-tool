@@ -1,13 +1,3 @@
-use serde::{Serialize, Deserialize};
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub enum CommandType {
-    Add,
-    List,
-    Remove,
-    Update,
-    Watch,
-}
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Reminder {

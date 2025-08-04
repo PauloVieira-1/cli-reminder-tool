@@ -95,6 +95,14 @@ pub fn remove_reminder(id: i32) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+pub fn clear_reminders() -> Result<(), Box<dyn std::error::Error>> {
+    let file_path = get_data_file_path();
+    if file_path.exists() {
+        std::fs::remove_file(&file_path).expect("Failed to clear reminders");
+    } 
+    Ok(())
+}
+
 fn write_to_file(data: &Vec<Reminder>, file_path: &PathBuf) -> Result<(), Box<dyn std::error::Error>> {
 
     let serialized_data = serde_json::to_string(&data).expect("Could not serialize reminders");

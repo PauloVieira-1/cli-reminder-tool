@@ -19,7 +19,7 @@ pub async fn watch_reminders() -> Result<(), Box<dyn std::error::Error>> {
             if let Ok(due_time) = reminder_datetime {
                 if due_time <= now.naive_utc() {
                     println!("🔔 Reminder: {} - {}", reminder.title, reminder.description);
-                    create_notification()?; 
+                    create_notification([reminder.title.clone(), reminder.description.clone()])?; 
                     remove_reminder(reminder.id)?; 
                 }
             }
