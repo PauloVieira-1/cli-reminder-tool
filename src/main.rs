@@ -2,13 +2,14 @@ mod reminder;
 mod data_manager;
 mod timer;
 mod watcher;
+mod command_handler;
 
 use std::env::args;
 use reminder::{Reminder, CommandType};
 use data_manager::{save_reminder_to_file, get_remdiners, remove_reminder};
-use rand::Rng;
 use timer::start_timer;
 use watcher::watch_reminders;
+use command_handler::{add_command, list_reminders, remove_command, update_command};
 
 
 #[tokio::main]
@@ -42,39 +43,12 @@ fn get_command(command_str: &str) -> Option<CommandType> {
 async fn handle_command(command: CommandType, args: &[String]) {
     match command {
         CommandType::Add => {
-            println!("Adding a new reminder...");
-            let id = rand::thread_rng().gen_range(1..100000);
-            let reminder = Reminder::new(id, args[2].clone(), args[3].clone(), args[4].clone(), args[5].clone());
-            save_reminder_to_file(&reminder);
+            add_command(args);
             timer::start_timer(format!("{} {}", args[4], args[5]));
         }
-        CommandType::List => {
-
-            let longest_length = get_longest_vector_length(&data_manager::get_remdiners());
-
-            println!("\n\n######################");
-            println!("Listing all reminders:");
-            println!("######################\n");
-            
-            let reminders = data_manager::get_remdiners();
-            
-            if reminders.is_empty() {
-                println!("No reminders found.");
-            }
-            
-            println!("{:-^1$}", "", longest_length);
-            for r in reminders {
-                println!("ID: {}, Title: {}, Description: {}, Due Date: {}, Time Stamp: {}", r.id, r.title, r.description, r.due_date, r.timestamp);
-            println!("{:-^1$}", "", longest_length);
-            }
-            
-            println!("\n")
-        }
-        CommandType::Remove => {
-            println!("Removing a reminder...");
-            data_manager::remove_reminder(args[2].parse().unwrap()).expect("Failed to remove reminder");
-        }
-        CommandType::Update => { println!("Updating a reminder...") },
+        CommandType::List => list_reminders(),
+        CommandType::Remove => remove_command(args),
+        CommandType::Update => update_command(args),
         CommandType::Watch => {
             println!("Starting reminder watcher...");
             watch_reminders().await.expect("Failed to start watcher");
@@ -122,7 +96,7 @@ fn check_args(args: &[String]) -> bool {
     true
 }
 
-fn check_date_time (date_time: &str) -> bool {
+fn check_date_time(date_time: &str) -> bool {
     let parts: Vec<&str> = date_time.split_whitespace().collect();
     if parts.len() != 2 {
         return false;
@@ -139,18 +113,3 @@ fn check_date_time (date_time: &str) -> bool {
     }
     true
 }
-
-
-fn get_longest_vector_length(vectors: &Vec<Reminder>) -> usize {
-
-    let mut longest_length = 0;
-
-    for reminder in vectors {
-        let reminder_string = format!("ID: {}, Title: {}, Description: {}, Due Date: {}, Time Stamp: {}", reminder.id, reminder.title, reminder.description, reminder.due_date, reminder.timestamp);
-        if reminder_string.len() > longest_length {
-            longest_length = reminder_string.len(); 
-        }
-    }
-    longest_length
-}
-
