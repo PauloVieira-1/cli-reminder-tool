@@ -46,9 +46,9 @@ fn handle_command(command: CommandType, args: &[String]) {
 
             let longest_length = get_longest_vector_length(&data_manager::get_remdiners());
 
-            println!("\n#################################");
+            println!("\n\n######################");
             println!("Listing all reminders:");
-            println!("#################################\n");
+            println!("######################\n");
             
             let reminders = data_manager::get_remdiners();
             
