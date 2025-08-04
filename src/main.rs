@@ -1,5 +1,6 @@
 mod reminder;
 mod data_manager;
+mod timer;
 
 use std::env::args;
 use reminder::{Reminder, CommandType};
@@ -38,7 +39,7 @@ fn handle_command(command: CommandType, args: &[String]) {
         CommandType::Add => {
             println!("Adding a new reminder...");
             let id = rand::thread_rng().gen_range(1..100000);
-            let reminder = Reminder::new(id, args[2].clone(), args[3].clone(), args[4].clone());
+            let reminder = Reminder::new(id, args[2].clone(), args[3].clone(), args[4].clone(), args[5].clone());
             save_reminder_to_file(&reminder);
         }
         CommandType::List => {
@@ -54,7 +55,7 @@ fn handle_command(command: CommandType, args: &[String]) {
             
             println!("----------------------------------------------------------------------");
             for r in reminders {
-                println!("ID: {}, Title: {}, Description: {}, Due Date: {}", r.id, r.title, r.description, r.due_date);
+                println!("ID: {}, Title: {}, Description: {}, Due Date: {}, Time Stamp: {}", r.id, r.title, r.description, r.due_date, r.timestamp);
             println!("----------------------------------------------------------------------");
             }
             
@@ -71,31 +72,58 @@ fn handle_command(command: CommandType, args: &[String]) {
 fn check_args(args: &[String]) -> bool {
     let command = &args[1].to_lowercase();
 
-    match args.len() {
-        2 => {
-            if command == "list" {
-                true
-            } else {
-                println!("Usage: cli_reminder_tool list");
-                false
-            }
-        }
-        3 => {
-            if command == "remove" || command == "update" {
-                true
-            } else {
-                println!("Usage: cli_reminder_tool remove <id> | update <id> <title> <description> <due_date>");
-                false
-            }
-        }
+    println!("args: {:?}", args);
+    let expected_argument_count = match command.as_str() {
+        "list" => 2,
+        "remove" | "update" => 3,
+        "add" => 6,
         _ => {
-            if args.len() < 5 {
-                println!("Usage: cli_reminder_tool add <title> <description> <due_date>");
-                return false;
-            }
+            println!("Invalid command: {}", command);
+            return false;
+        }
+    };
 
-            true
+    if args.len() != expected_argument_count {
+        println!(
+            "Usage: cli_reminder_tool {} <{}>",
+            command,
+            match command.as_str() {
+                "list" => "".to_string(),
+                "remove" => "<id>".to_string(),
+                "update" => "<id> <title> <description> <due_date:YYYY-MM-DD>".to_string(),
+                "add" => "<title> <description> <due_date:YYYY-MM-DD> <time:HH:MM>".to_string(),
+                _ => unreachable!(),
+            }
+        );
+        return false;
+    }
+
+    if command == "add"{
+        let date_time = format!("{} {}", args[4], args[5]);
+        if (!check_date_time(&date_time)) {
+            println!("Invalid date or time format. Please use 'YYYY-MM-DD HH:MM'.");
+            return false;
         }
     }
+
+    true
+}
+
+fn check_date_time (date_time: &str) -> bool {
+    let parts: Vec<&str> = date_time.split_whitespace().collect();
+    if parts.len() != 2 {
+        return false;
+    }
+
+    let date_parts: Vec<&str> = parts[0].split('-').collect();
+    if date_parts.len() != 3 {
+        return false;
+    }
+
+    let time_parts: Vec<&str> = parts[1].split(':').collect();
+    if time_parts.len() != 2 {
+        return false;
+    }
+    true
 }
 

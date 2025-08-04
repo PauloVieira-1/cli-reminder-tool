@@ -14,10 +14,19 @@ pub struct Reminder {
     pub title: String,
     pub description: String,
     pub due_date: String,
+    pub timestamp: String,
 }
 
 impl Reminder {
-    pub fn new(id: i32, title: String, description: String, due_date: String) -> Self {
-        Self { id, title, description, due_date }
+    pub fn new(id: i32, title: String, description: String, due_date: String, timestamp: String) -> Self {
+        Self { id, title, description, due_date, timestamp }
+    }
+
+    pub fn get_id(&self) -> i32 {
+        self.id
+    }
+
+    pub fn get_title(&self) -> &str {
+        &self.title
     }
 }

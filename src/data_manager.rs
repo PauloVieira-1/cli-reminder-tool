@@ -3,6 +3,7 @@ use std::path::PathBuf;
 use crate::reminder::Reminder;
 use std::result;
 
+
 fn get_data_file_path() -> PathBuf {
     let data_dir = dirs::config_dir().expect("Could not determine config directory");
     // println!("Data directory: {}", data_dir.display());
@@ -19,8 +20,11 @@ pub fn save_reminder_to_file(reminder: &Reminder) {
 
     if file_path.exists() {
         let data = std::fs::read_to_string(&file_path).expect("Could not read data file");
-        reminders = serde_json::from_str(&data).expect("Could not parse data file");
-    }
+        match serde_json::from_str(&data) {
+            Ok(r) => reminders = r,
+            Err(_) => reminders = vec![], 
+        }
+    } 
 
     reminders.push(reminder.clone());
     
