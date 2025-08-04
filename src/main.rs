@@ -43,6 +43,9 @@ fn handle_command(command: CommandType, args: &[String]) {
             save_reminder_to_file(&reminder);
         }
         CommandType::List => {
+
+            let longest_length = get_longest_vector_length(&data_manager::get_remdiners());
+
             println!("\n#################################");
             println!("Listing all reminders:");
             println!("#################################\n");
@@ -53,10 +56,10 @@ fn handle_command(command: CommandType, args: &[String]) {
                 println!("No reminders found.");
             }
             
-            println!("----------------------------------------------------------------------");
+            println!("{:-^1$}", "", longest_length);
             for r in reminders {
                 println!("ID: {}, Title: {}, Description: {}, Due Date: {}, Time Stamp: {}", r.id, r.title, r.description, r.due_date, r.timestamp);
-            println!("----------------------------------------------------------------------");
+            println!("{:-^1$}", "", longest_length);
             }
             
             println!("\n")
@@ -100,7 +103,7 @@ fn check_args(args: &[String]) -> bool {
 
     if command == "add"{
         let date_time = format!("{} {}", args[4], args[5]);
-        if (!check_date_time(&date_time)) {
+        if !check_date_time(&date_time) {
             println!("Invalid date or time format. Please use 'YYYY-MM-DD HH:MM'.");
             return false;
         }
@@ -125,5 +128,19 @@ fn check_date_time (date_time: &str) -> bool {
         return false;
     }
     true
+}
+
+
+fn get_longest_vector_length(vectors: &Vec<Reminder>) -> usize {
+
+    let mut longest_length = 0;
+
+    for reminder in vectors {
+        let reminder_string = format!("ID: {}, Title: {}, Description: {}, Due Date: {}, Time Stamp: {}", reminder.id, reminder.title, reminder.description, reminder.due_date, reminder.timestamp);
+        if reminder_string.len() > longest_length {
+            longest_length = reminder_string.len(); 
+        }
+    }
+    longest_length
 }
 
