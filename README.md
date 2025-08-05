@@ -108,11 +108,12 @@ reminder update 12345 "Dentist" "Check-up rescheduled" 2025-08-10
 ---
 ### **Watch a reminder**
 
-# Must be done in order to recieve notifictaions 
+#### Must be done in order to recieve notifictaions 
 
 ```bash
 reminder watch
 ```
+---
 
 ## ⚙️ How It Works
 
