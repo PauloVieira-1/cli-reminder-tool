@@ -2,6 +2,7 @@ use chrono::Utc;
 use tokio::time::{sleep, Duration};
 use crate::data_manager::{get_remdiners, remove_reminder};
 use crate::timer::create_notification;
+use colored::Colorize;
 
 /// Watches the reminders and triggers a notification when the due date is reached.
 ///
@@ -13,7 +14,7 @@ use crate::timer::create_notification;
 ///
 /// The function returns a Result to handle any errors that may occur while running the loop.
 pub async fn watch_reminders() -> Result<(), Box<dyn std::error::Error>> {
-    println!("📅 Reminder watcher started...");
+    println!("{}", format!("\n📅 Reminder watcher started...").blue());
 
     loop {
         let reminders = get_remdiners();
@@ -27,7 +28,7 @@ pub async fn watch_reminders() -> Result<(), Box<dyn std::error::Error>> {
 
             if let Ok(due_time) = reminder_datetime {
                 if due_time <= now.naive_utc() {
-                    println!("🔔 Reminder: {} - {}", reminder.title, reminder.description);
+                    println!("{}", format!("🔔 Reminder: {} - {}", reminder.title, reminder.description).yellow()); 
                     create_notification([reminder.title.clone(), reminder.description.clone()])?; 
                     remove_reminder(reminder.id)?; 
                 }

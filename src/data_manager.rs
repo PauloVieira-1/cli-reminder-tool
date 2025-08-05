@@ -1,8 +1,7 @@
 use dirs;
 use std::path::PathBuf;
 use crate::reminder::Reminder;
-use std::result;
-use chrono::NaiveDateTime;
+use colored::Colorize;
 
 
 fn get_data_file_path() -> PathBuf {
@@ -35,7 +34,8 @@ pub fn save_reminder_to_file(reminder: &Reminder) {
     reminders.push(reminder.clone());
 
     write_to_file(&reminders, &file_path).expect("Could not write to data file");
-    println!("Reminder saved successfully!");
+    println!("{}", format!("Reminder saved successfully!").green());
+
 }
 
 pub fn get_remdiners() -> Vec<Reminder> {
@@ -71,9 +71,9 @@ pub fn update_reminders(id: i32, title: String, description: String, due_date: S
     r.description = description;
     r.due_date = due_date;
     r.timestamp = timestamp;
-    println!("Reminder with ID {} updated successfully!", id);
+    println!("{}", format!("Reminder with ID {} updated successfully!", id).green());
     } else {
-      println!("No reminder found with the specified ID.");
+        println!("{}", "No reminder found with the specified ID.".red());
         return Ok(());
     }
 
@@ -93,7 +93,7 @@ fn check_date_time(reminder: &Reminder) -> bool {
     let currrent_time = chrono::Utc::now().naive_utc();
     if let Ok(due_time) = reminder_datetime {
         if due_time < currrent_time {
-            println!("Due date and time must be in the future.");
+            println!("{}", "Due date and time must be in the future.".red());
             return false;
         }
     }
@@ -111,14 +111,14 @@ pub fn remove_reminder(id: i32) -> Result<(), Box<dyn std::error::Error>> {
     }
 
     if reminders.iter().all(|r| r.id != id) { 
-        println!("No reminders found with the specified ID.");
+        println!("{}", "No reminders found with the specified ID.".red());
         return Ok(());
     }
 
     reminders.retain(|r| r.id != id);
 
     write_to_file(&reminders, &file_path).expect("Could not write to data file");
-    println!("Reminder with ID {} removed successfully!", id);
+    println!("{}", format!("Reminder with ID {} removed successfully!", id).green());
 
     Ok(())
 }

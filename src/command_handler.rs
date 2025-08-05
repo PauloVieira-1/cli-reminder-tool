@@ -1,8 +1,10 @@
 
 use rand::Rng;
-use crate::reminder::{Reminder};
-use crate::data_manager::{save_reminder_to_file, get_remdiners, remove_reminder, update_reminders, clear_reminders};
+use crate::data_manager::{update_reminders, clear_reminders, remove_reminder, get_remdiners, save_reminder_to_file};
 use serde::{Serialize, Deserialize};
+use colored::Colorize;
+use crate::reminder::Reminder;
+
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum CommandType {
@@ -15,8 +17,8 @@ pub enum CommandType {
 }
 
 pub fn add_command(args: &[String]) {
-    println!("Adding a new reminder...");
-    let id = rand::thread_rng().gen_range(1..100000);
+    println!("{}", format!("\nAdding a new reminder...").blue());
+    let id = rand::rng().random_range(1..100000);
     let reminder = Reminder::new(id, args[2].clone(), args[3].clone(), args[4].clone(), args[5].clone());
     save_reminder_to_file(&reminder);
 }
@@ -25,15 +27,15 @@ pub fn add_command(args: &[String]) {
 pub fn list_reminders() {
     let reminders = get_remdiners();
     if reminders.is_empty() {
-        println!("No reminders found.");
+        println!("{}", format!("No reminders found.").red());
         return;
     }
 
     let longest_length: usize= get_longest_vector_length(&reminders);
 
-    println!("\n\n######################");
-    println!("Listing all reminders:");
-    println!("######################\n");
+    println!("{}", format!("\n--------------------------").blue());
+    println!("{}", format!("| Listing all reminders: |").blue());
+    println!("{}", format!("--------------------------\n").blue());
 
      println!("{:-^1$}", "", longest_length);
             for r in reminders {
@@ -45,13 +47,13 @@ pub fn list_reminders() {
 }
 
 pub fn remove_command(args: &[String]) {
-    println!("Removing a reminder...");
+    println!("{}", format!("\nRemoving a reminder...").blue());
     let id: i32 = args[2].parse().expect("Invalid ID format");
     remove_reminder(id).expect("Failed to remove reminder");
 }
 
 pub fn update_command(args: &[String]) {
-    println!("Updating a reminder...");
+    println!("{}", format!("\nUpdating a reminder...").blue());
     update_reminders(
         args[2].parse().expect("Invalid ID format"),
         args[3].clone(),
@@ -76,7 +78,7 @@ pub fn get_longest_vector_length(vectors: &Vec<Reminder>) -> usize {
 }
 
 pub fn clear_command(){
-    println!("Clearing all reminders...");
+    println!("{}", format!("\nClearing all reminders...").blue());
     clear_reminders().expect("Failed to clear reminders");
-    println!("Reminders cleared successfully!");   
+    println!("{}", format!("Reminders cleared successfully!").green());   
 }

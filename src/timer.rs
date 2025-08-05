@@ -1,6 +1,3 @@
-use chrono::{DateTime, Utc};
-use tokio::time;
-use std::time::Duration;
 use std::process::Command;
 
 /// Creates a native notification on the user's system with the provided reminder data.

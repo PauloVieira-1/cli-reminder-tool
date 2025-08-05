@@ -5,10 +5,9 @@ mod watcher;
 mod command_handler;
 
 use std::env::args;
-use reminder::{Reminder};
-use data_manager::{save_reminder_to_file, get_remdiners, remove_reminder};
 use watcher::watch_reminders;
 use command_handler::{add_command, list_reminders, remove_command, update_command, clear_command, CommandType};
+use colored::Colorize;
 
 
 /// The main entry point for the cli reminder tool.
@@ -32,8 +31,8 @@ async fn main() {
     if let Some(command) = command_str {
         handle_command(command, &arguments).await;
     } else {
-        eprintln!("Invalid command: {}", arguments[1]);
-    }
+        eprintln!("{}", format!("Invalid command: {}", arguments[1]).red());
+}
 }
 
 fn get_command(command_str: &str) -> Option<CommandType> {
@@ -57,10 +56,7 @@ async fn handle_command(command: CommandType, args: &[String]) {
         CommandType::Remove => remove_command(args),
         CommandType::Update => update_command(args),
         CommandType::Clear => clear_command(),
-        CommandType::Watch => {
-            println!("Starting reminder watcher...");
-            watch_reminders().await.expect("Failed to start watcher");
-        }
+        CommandType::Watch => watch_reminders().await.expect("Failed to start watcher"),
     }
 }
 
@@ -76,7 +72,7 @@ fn check_args(args: &[String]) -> bool {
         "add" => 6,
         "update" => 7,
         _ => {
-            println!("Invalid command: {}", command);
+            eprintln!("{}", format!("Invalid command: {}", command));
             return false;
         }
     };
@@ -99,7 +95,7 @@ fn check_args(args: &[String]) -> bool {
     if command == "add"{
         let date_time = format!("{} {}", args[4], args[5]);
         if !check_date_time(&date_time) {
-            println!("Invalid date or time format. Please use 'YYYY-MM-DD HH:MM'.");
+            println!("{}", format!("Invalid date or time format. Please use 'YYYY-MM-DD HH:MM'.").red());
             return false;
         }
     }
