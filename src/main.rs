@@ -64,8 +64,6 @@ async fn handle_command(command: CommandType, args: &[String]) {
     /// Returns false if the arguments are invalid, true otherwise.
 fn check_args(args: &[String]) -> bool {
     let command = &args[1].to_lowercase();
-
-    println!("args: {:?}", args);
     let expected_argument_count = match command.as_str() {
         "list" | "watch" | "clear" => 2,
         "remove" => 3,

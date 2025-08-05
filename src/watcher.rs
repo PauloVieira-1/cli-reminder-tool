@@ -1,4 +1,4 @@
-use chrono::Utc;
+use chrono::{NaiveDateTime, Local};
 use tokio::time::{sleep, Duration};
 use crate::data_manager::{get_remdiners, remove_reminder};
 use crate::timer::create_notification;
@@ -18,23 +18,23 @@ pub async fn watch_reminders() -> Result<(), Box<dyn std::error::Error>> {
 
     loop {
         let reminders = get_remdiners();
-        let now = Utc::now();
+        let now = Local::now().naive_local();
 
         for reminder in reminders {
-            let reminder_datetime = chrono::NaiveDateTime::parse_from_str(
+            let reminder_datetime = NaiveDateTime::parse_from_str(
                 &format!("{} {}", reminder.due_date, reminder.timestamp),
                 "%Y-%m-%d %H:%M"
             );
 
             if let Ok(due_time) = reminder_datetime {
-                if due_time <= now.naive_utc() {
-                    println!("{}", format!("🔔 Reminder: {} - {}", reminder.title, reminder.description).yellow()); 
-                    create_notification([reminder.title.clone(), reminder.description.clone()])?; 
-                    remove_reminder(reminder.id)?; 
+                if due_time <= now {
+                    println!("{}", format!("🔔 Reminder: {} - {}", reminder.title, reminder.description).yellow());
+                    create_notification([reminder.title.clone(), reminder.description.clone()])?;
+                    remove_reminder(reminder.id)?;
                 }
             }
         }
 
-        sleep(Duration::from_secs(60)).await; 
+        sleep(Duration::from_secs(60)).await;
     }
 }

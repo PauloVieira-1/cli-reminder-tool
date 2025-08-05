@@ -36,7 +36,7 @@ cargo build --release
 ### 3️⃣ Run the binary
 
 ```bash
-./target/release/cli-reminder-tool
+./target/release/cli-reminder-tool 
 ```
 
 *(Optional: Move binary to PATH for global access)*
