@@ -3,27 +3,17 @@ use tokio::time;
 use std::time::Duration;
 use std::process::Command;
 
-// pub async fn start_timer(datetime: String) -> Result<(), Box<dyn std::error::Error>> {
-
-//     let current_time: DateTime<Utc> = Utc::now();
-//     let due_date = DateTime::parse_from_str(&datetime, "%Y-%m-%d %H:%M")?;
-
-//     if due_date < current_time {
-//         eprintln!("Due date is in the past. Please provide a future date.");
-//         return Ok(());
-//     }
-
-//     let duration = due_date.signed_duration_since(current_time).to_std()?;
-//     println!("Timer set for {} seconds.", duration.as_secs());
-//     time::sleep(Duration::from_secs(duration.as_secs())).await;
-//     println!("Time's up! Reminder for: {}", datetime);
-//     create_notification()?;
-//     Ok(())
-
-// }
+/// Creates a native notification on the user's system with the provided reminder data.
+/// 
+/// The reminder data is expected to be a tuple of two strings, where the first string is the title
+/// of the reminder and the second string is the description of the reminder.
+/// 
+/// On macOS, the `osascript` command is used to execute the AppleScript command to display a
+/// notification.
+/// 
+/// If the command fails to execute, an error is returned.
 
 #[cfg(target_os = "macos")]
-
 pub fn create_notification(reminder_data: [String; 2]) -> Result<(), Box<dyn std::error::Error>> {
     Command::new("osascript")
         .arg("-e")
@@ -34,4 +24,25 @@ pub fn create_notification(reminder_data: [String; 2]) -> Result<(), Box<dyn std
         .output()?;
     Ok(())
 }
+
+
+/// Creates a native notification on the user's system with the provided reminder data.
+/// 
+/// The reminder data is expected to be a tuple of two strings, where the first string is the title
+/// of the reminder and the second string is the description of the reminder.
+/// 
+/// If the command fails to execute, an error is returned.
+
+#[cfg(target_os = "windows")]
+pub fn create_notification(reminder_data: [String; 2]) -> Result<(), Box<dyn std::error::Error>> {
+    Command::new("powershell")
+        .arg("-Command")
+        .arg(&format!(
+            "[System.Windows.MessageBox]::Show('{}', '{}')",
+            reminder_data[1], reminder_data[0]
+        ))
+        .output()?;
+    Ok(())
+}
+
 

@@ -3,6 +3,15 @@ use tokio::time::{sleep, Duration};
 use crate::data_manager::{get_remdiners, remove_reminder};
 use crate::timer::create_notification;
 
+/// Watches the reminders and triggers a notification when the due date is reached.
+///
+/// This function runs an infinite loop that every 60 seconds checks if the due date
+/// of any reminder is reached. If so, it triggers a notification and removes the reminder.
+///
+/// The function can be used with the tokio runtime to run the loop concurrently with
+/// other tasks.
+///
+/// The function returns a Result to handle any errors that may occur while running the loop.
 pub async fn watch_reminders() -> Result<(), Box<dyn std::error::Error>> {
     println!("📅 Reminder watcher started...");
 

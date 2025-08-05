@@ -7,10 +7,17 @@ mod command_handler;
 use std::env::args;
 use reminder::{Reminder};
 use data_manager::{save_reminder_to_file, get_remdiners, remove_reminder};
-// use timer::start_timer;
 use watcher::watch_reminders;
 use command_handler::{add_command, list_reminders, remove_command, update_command, clear_command, CommandType};
 
+
+/// The main entry point for the cli reminder tool.
+///
+/// This function is responsible for parsing the command line arguments and
+/// delegating the execution to the correct command handler.
+///
+/// The function will print an error message if the arguments are invalid, or
+/// if the command is invalid.
 
 #[tokio::main]
 async fn main() {
@@ -57,6 +64,8 @@ async fn handle_command(command: CommandType, args: &[String]) {
     }
 }
 
+    /// Checks the given arguments for the correct command and argument count.
+    /// Returns false if the arguments are invalid, true otherwise.
 fn check_args(args: &[String]) -> bool {
     let command = &args[1].to_lowercase();
 
@@ -98,6 +107,9 @@ fn check_args(args: &[String]) -> bool {
     true
 }
 
+    /// Checks if the given date_time string is in the correct format.
+    /// The format must be "YYYY-MM-DD HH:MM".
+    /// Returns true if the format is correct, false otherwise.
 fn check_date_time(date_time: &str) -> bool {
     let parts: Vec<&str> = date_time.split_whitespace().collect();
     if parts.len() != 2 {
