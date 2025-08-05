@@ -2,6 +2,7 @@ use dirs;
 use std::path::PathBuf;
 use crate::reminder::Reminder;
 use std::result;
+use chrono::NaiveDateTime;
 
 
 fn get_data_file_path() -> PathBuf {
@@ -15,6 +16,11 @@ fn get_data_file_path() -> PathBuf {
 }
 
 pub fn save_reminder_to_file(reminder: &Reminder) {
+    
+    if !check_date_time(reminder) {
+        return;
+    }
+
     let file_path = get_data_file_path();
     let mut reminders: Vec<Reminder> = vec![];
 
@@ -43,34 +49,56 @@ pub fn get_remdiners() -> Vec<Reminder> {
 
 }
 
-pub fn update_reminders(id: i32, title: String, description: String, due_date: String) -> Result<(), Box<dyn std::error::Error>> {
-    let file_path = get_data_file_path();
-    let mut reminders: Vec<Reminder> = vec![];
+pub fn update_reminders(id: i32, title: String, description: String, due_date: String, timestamp: String) -> Result<(), Box<dyn std::error::Error>> {
+    
 
-    if file_path.exists() {
-        let data = std::fs::read_to_string(&file_path).expect("Could not read data file");
-        reminders = serde_json::from_str(&data).expect("Could not parse data file");
+    let reminder = Reminder::new(id, title.clone(), description.clone(), due_date.clone(), timestamp.clone());
+    
+    if !check_date_time(&reminder) {
+        return Ok(());
     }
+    
+    let file_path = get_data_file_path();
+    let mut reminders: Vec<Reminder> = if file_path.exists() {
+        let data = std::fs::read_to_string(&file_path)?;
+        serde_json::from_str(&data)?
+    } else {
+        vec![]
+    };
 
-    if reminders.iter().all(|r| r.id != id) { 
-        println!("No reminders found with the specified ID.");
+    if let Some(r) = reminders.iter_mut().find(|r| r.id == id) {
+    r.title = title;
+    r.description = description;
+    r.due_date = due_date;
+    r.timestamp = timestamp;
+    println!("Reminder with ID {} updated successfully!", id);
+    } else {
+      println!("No reminder found with the specified ID.");
         return Ok(());
     }
 
-    for r in &mut reminders {
-        if r.id == id {
-            r.title = title.clone();
-            r.description = description.clone();
-            r.due_date = due_date.clone();
-        }
-    }
 
-    write_to_file(&reminders, &file_path).expect("Could not write to data file");
-    println!("Reminder with ID {} updated successfully!", id);
+    write_to_file(&reminders, &file_path)?;
 
     Ok(())
 }
 
+
+fn check_date_time(reminder: &Reminder) -> bool {
+    let reminder_datetime = chrono::NaiveDateTime::parse_from_str(
+                &format!("{} {}", reminder.due_date, reminder.timestamp),
+                "%Y-%m-%d %H:%M"
+            );
+
+    let currrent_time = chrono::Utc::now().naive_utc();
+    if let Ok(due_time) = reminder_datetime {
+        if due_time < currrent_time {
+            println!("Due date and time must be in the future.");
+            return false;
+        }
+    }
+    true
+}
 
 
 pub fn remove_reminder(id: i32) -> Result<(), Box<dyn std::error::Error>> {

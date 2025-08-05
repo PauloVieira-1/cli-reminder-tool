@@ -63,8 +63,9 @@ fn check_args(args: &[String]) -> bool {
     println!("args: {:?}", args);
     let expected_argument_count = match command.as_str() {
         "list" | "watch" | "clear" => 2,
-        "remove" | "update" => 3,
+        "remove" => 3,
         "add" => 6,
+        "update" => 7,
         _ => {
             println!("Invalid command: {}", command);
             return false;
@@ -78,7 +79,7 @@ fn check_args(args: &[String]) -> bool {
             match command.as_str() {
                 "list" => "".to_string(),
                 "remove" => "<id>".to_string(),
-                "update" => "<id> <title> <description> <due_date:YYYY-MM-DD>".to_string(),
+                "update" => "<id> <title> <description> <due_date:YYYY-MM-DD> <time:HH:MM>".to_string(),
                 "add" => "<title> <description> <due_date:YYYY-MM-DD> <time:HH:MM>".to_string(),
                 _ => unreachable!(),
             }

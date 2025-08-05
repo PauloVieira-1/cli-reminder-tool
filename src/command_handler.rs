@@ -57,8 +57,8 @@ pub fn update_command(args: &[String]) {
         args[3].clone(),
         args[4].clone(),
         args[5].clone(),
+        args[6].clone()
     ).expect("Failed to update reminder");
-    println!("Reminder updated successfully!");
 }
 
 
